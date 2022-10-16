@@ -240,8 +240,8 @@ async def getReport(hass, headersData, allData, deviceID):
     now = datetime.now()
 
 
-    reportData = '{"deviceID":"'+deviceID+'","reportType":"day","variables":["feedin","generation","gridConsumption","chargeEnergyToTal","dischargeEnergyToTal","loads"],"queryDate":{"year":'+now.strftime(
-        "%Y")+',"month":'+now.strftime("%_m")+',"day":'+now.strftime("%_d")+'}}'
+    reportData = '{"deviceID":"'+deviceID+'","reportType":"month","variables":["feedin","generation","gridConsumption","chargeEnergyToTal","dischargeEnergyToTal","loads"],"queryDate":{"year":'+now.strftime(
+        "%Y")+',"month":'+now.strftime("%_m")+',"day":null,"hour":2}}'
 
     restReport = RestData(hass, METHOD_POST, _ENDPOINT_REPORT,
                           None, headersData, None, reportData, DEFAULT_VERIFY_SSL)
@@ -258,14 +258,9 @@ async def getReport(hass, headersData, allData, deviceID):
         for item in json.loads(restReport.data)['result']:
             variableName = item['variable']
             allData['report'][variableName] = None
-            # Daily reports break down the data hour by hour for the whole day
-            # even if we're only partially through, so sum the values together
-            # to get our daily total so far...
-            cumulative_total = 0
-            for dataItem in item['data']:
-                cumulative_total += dataItem['value']
-            allData['report'][variableName] = cumulative_total
 
+            currentDayIdx = int(datetime.now().strftime("%d")) - 1
+            allData['report'][variableName] = item['data'][currentDayIdx]['value']
 
 async def getRaw(hass, headersData, allData, deviceID):
     now = datetime.now()
