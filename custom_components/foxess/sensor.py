@@ -174,7 +174,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 async def authAndgetToken(hass, username, hashedPassword):
 
-    payloadAuth = {"user": username, "password": hashedPassword}
+    payloadAuth = f'user={username}&password={hashedPassword}'
     user_agent = user_agent_rotator.get_random_user_agent() 
     headersAuth = {"User-Agent": user_agent,
                    "Accept": "application/json, text/plain, */*",
